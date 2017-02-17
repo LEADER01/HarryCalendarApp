@@ -4,9 +4,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:openDrawer="start">
+    android:layout_height="match_parent">
+    <!-- Left Drawer -->
+    <RelativeLayout
+        android:id="@+id/whatYouWantInLeftDrawer"
+        android:layout_width="240dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start" >
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/background_dark" />
+        <!-- you can have many more widgets here like buttons or labels -->
+    </RelativeLayout>
 
     <include
         layout="@layout/app_bar_main"
