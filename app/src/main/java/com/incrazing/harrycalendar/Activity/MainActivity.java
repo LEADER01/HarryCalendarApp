@@ -4,30 +4,29 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.flexbox.FlexboxLayout;
 import com.incrazing.harrycalendar.R;
 import com.incrazing.harrycalendar.app.Config;
+import com.incrazing.harrycalendar.helper.CommentsDataSource;
+import com.incrazing.harrycalendar.helper.MySQLiteHelper;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -38,6 +37,8 @@ public class MainActivity extends AppCompatActivity
     Context context;
     RelativeLayout leftRL;
     DrawerLayout drawerLayout;
+
+    String TAG = getClass().getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,8 +75,12 @@ public class MainActivity extends AppCompatActivity
         Calendar mycal, computedDay, today = Calendar.getInstance();
         int daysInMonth;
         FlexboxLayout.LayoutParams param;
-        Typeface typeface = Typeface.createFromAsset(getAssets(), "fonts/AldotheApache.ttf");
 
+        CommentsDataSource datasource = new CommentsDataSource(this);
+        datasource.open();
+
+        Typeface typeface = Typeface.createFromAsset(getAssets(), "fonts/AldotheApache.ttf");
+        int value = 0;
         for (int i = 0; i < 12; i++) {
             mycal = new GregorianCalendar(currentYear, i, one);
             daysInMonth = mycal.getActualMaximum(Calendar.DAY_OF_MONTH); // 28
@@ -97,17 +102,29 @@ public class MainActivity extends AppCompatActivity
                     dayButton.setBackground(getDrawable(R.drawable.day_button_shape));
                 }
                 if (!isFutureDate) {
+                    // save the new comment to the database
                 if (Math.random() < 0.3) {
                     dayButton.setBackgroundColor(Config.getColor(R.color.colorNegative, context));
+                    value = 0;
                     negativeDays++;
                 }
                 else {
                     dayButton.setBackgroundColor(Config.getColor(R.color.colorPositive, context));
+                    value = 1;
                     positiveDays++;
                 }
+                    datasource.recordValue(currentYear+"-"+(i+1)+"-"+j, value);
                 }
-                if (computedDay.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR))
+                if (computedDay.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)) {
+                    dayButton.setBackgroundColor(Config.getColor(R.color.BLUE_300, context));
+                    dayButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(final View view) {
+                                    Toast.makeText(context, "Clicky click", Toast.LENGTH_SHORT).show();     
+                                }
+                            });
                     isFutureDate = true;
+                }
                 dayButton.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.TOP);
                 content.addView(dayButton);
             }
@@ -119,6 +136,9 @@ public class MainActivity extends AppCompatActivity
         TextView posText = (TextView) findViewById(R.id.positive_day_text);
         posText.setTypeface(typeface);
         posText.setText(positiveDays+" Days");
+
+        MySQLiteHelper helper = new MySQLiteHelper(getApplicationContext());
+        Log.d(TAG, "onCreate: "+helper.getTableAsString(MySQLiteHelper.TABLE_DAYS));
 
     }
 
