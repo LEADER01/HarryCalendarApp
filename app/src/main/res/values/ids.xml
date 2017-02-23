@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="overlay_happy_face" type="id" />
+    <item name="overlay_sad_face" type="id" />
+    <item name="overlay_background" type="id" />
+    <!--<item name="acceptButtonId" type="id" />-->
+</resources>
