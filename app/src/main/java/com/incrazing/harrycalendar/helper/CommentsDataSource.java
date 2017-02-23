@@ -60,6 +60,21 @@ public class CommentsDataSource {
         return value;
     }
 
+    public int getRowCountByValue(int value) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor mCount= db.rawQuery("select count(*) from "+MySQLiteHelper.TABLE_DAYS+" where "+MySQLiteHelper.COLUMN_VALUE+"=" + value, null);
+        mCount.moveToFirst();
+        int count= mCount.getInt(0);
+        mCount.close();
+        return count;
+    }
+
+    public void deleteDayValue(String date) {
+        database.delete(MySQLiteHelper.TABLE_DAYS, MySQLiteHelper.COLUMN_DATE
+                + " = '" + date + "'", null);
+        Log.d(TAG, "deleteDayValue: deleted day "+date);
+    }
+/*
    public List<Comment> getAllComments() {
         List<Comment> comments = new ArrayList<Comment>();
 
