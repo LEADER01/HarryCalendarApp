@@ -8,6 +8,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 public class CommentsDataSource {
 
@@ -18,6 +19,7 @@ public class CommentsDataSource {
             MySQLiteHelper.COLUMN_DATE,
             MySQLiteHelper.COLUMN_VALUE,
             MySQLiteHelper.COLUMN_TIMESTAMP};
+    private static String TAG = CommentsDataSource.class.getSimpleName();
 
     public CommentsDataSource(Context context) {
         dbHelper = new MySQLiteHelper(context);
@@ -45,11 +47,17 @@ public class CommentsDataSource {
 //        return newComment;
     }
 
-/*    public void deleteComment(Comment comment) {
-        long id = comment.getId();
-        System.out.println("Comment deleted with id: " + id);
-        database.delete(MySQLiteHelper.TABLE_DAYS, MySQLiteHelper.COLUMN_ID
-                + " = " + id, null);
+    public int getValueByDate(String date) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        Cursor cursor = db.query(MySQLiteHelper.TABLE_DAYS, new String[] { MySQLiteHelper.COLUMN_VALUE}, MySQLiteHelper.COLUMN_DATE + "=?",
+                new String[] { date }, null, null, null, null);
+        int value = 3;
+        if (cursor != null  && cursor.moveToFirst()) {
+            value = cursor.getInt(0);
+            cursor.close();
+        }
+        return value;
     }
 
    public List<Comment> getAllComments() {
